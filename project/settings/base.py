@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "django.contrib.postgres",
 
-    "apps.tenancy",  # your first app
+    "apps.tenancy",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
