@@ -57,7 +57,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "project.wsgi.application"
 ASGI_APPLICATION = "project.asgi.application"
 
-# Database lives in local/prod settings
 DATABASES = {}
 
 
@@ -70,5 +69,5 @@ USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Helpful for DB integrity
 DATABASES_ATOMIC_REQUESTS = True
+AUTH_USER_MODEL = "accounts.User"
