@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import RefreshToken
+from apps.tenancy.models import Tenant
 
 User = get_user_model()
 
@@ -9,10 +10,13 @@ User = get_user_model()
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True)
+    tenant_id = serializers.PrimaryKeyRelatedField(
+        queryset=Tenant.objects.all(), source="tenant", write_only=True
+    )
 
     class Meta:
         model = User
-        fields = ["id", "email", "username", "password", "password2"]
+        fields = ["id", "email", "username", "password", "password2", "tenant_id"]
 
     def validate(self, data):
         if data["password"] != data["password2"]:
@@ -55,6 +59,7 @@ class LoginSerializer(serializers.Serializer):
         }
 
 class UserSerializer(serializers.ModelSerializer):
+    tenant = serializers.StringRelatedField()
     class Meta:
         model = User
         fields = ["id", "email", "username", "role", "tenant"]
