@@ -21,7 +21,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "django.contrib.postgres",
 
-    "apps.tenancy",  # your first app
+    "apps.tenancy",
+    "apps.accounts",
 ]
 
 MIDDLEWARE = [
@@ -32,8 +33,15 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # later: add Tenant middleware here
+    "apps.tenancy.middleware.TenantMiddleware",
+    "apps.accounts.middleware.TenantMiddleware",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ]
+}
 
 ROOT_URLCONF = "project.urls"
 
@@ -56,7 +64,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "project.wsgi.application"
 ASGI_APPLICATION = "project.asgi.application"
 
-# Database lives in local/prod settings
 DATABASES = {}
 
 
@@ -69,5 +76,5 @@ USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Helpful for DB integrity
 DATABASES_ATOMIC_REQUESTS = True
+AUTH_USER_MODEL = "accounts.User"
