@@ -5,6 +5,7 @@ from .serializers import RegisterSerializer, UserSerializer, CustomTokenObtainPa
 from django.contrib.auth import get_user_model
 from rest_framework.permissions import IsAdminUser
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .permissions import IsSameTenant
 
 User = get_user_model()
 class RegisterView(generics.CreateAPIView):
@@ -19,5 +20,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class ListUsersView(generics.ListAPIView):
     serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser, IsSameTenant]
+
+    def get_queryset(self):
+        return User.objects.filter(tenant_id=self.request.user.tenant_id)
