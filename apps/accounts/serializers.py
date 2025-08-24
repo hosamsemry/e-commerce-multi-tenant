@@ -9,15 +9,20 @@ User = get_user_model()
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    ROLE_CHOICES = (
+        ("customer", "Customer"),
+        ("seller", "Seller"),
+        )
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True)
+    role = serializers.ChoiceField(choices=ROLE_CHOICES, default="customer")
     tenant_id = serializers.PrimaryKeyRelatedField(
         queryset=Tenant.objects.all(), source="tenant", write_only=True
     )
 
     class Meta:
         model = User
-        fields = ["id", "email", "username", "password", "password2", "tenant_id"]
+        fields = ["id", "email", "username", "password", "password2", "tenant_id", "role"]
 
     def validate(self, data):
         if data["password"] != data["password2"]:
