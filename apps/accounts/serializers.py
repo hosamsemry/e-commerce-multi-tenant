@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from apps.tenancy.models import Tenant
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -31,32 +32,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
-class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token["tenant_id"] = str(user.tenant_id)
+        token["role"] = user.role
 
-    def validate(self, data):
-        email = data.get("email")
-        password = data.get("password")
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Invalid credentials")
-
-        if not user.check_password(password):
-            raise serializers.ValidationError("Invalid credentials")
-
-        refresh = RefreshToken.for_user(user)
-        return {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            "user": {
-                "id": user.id,
-                "email": user.email,
-                "username": user.username,
-            },
-        }
+        return token
 
 class UserSerializer(serializers.ModelSerializer):
     tenant = serializers.StringRelatedField()
