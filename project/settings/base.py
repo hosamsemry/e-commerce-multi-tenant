@@ -36,7 +36,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.tenancy.middleware.TenantMiddleware",
-    "apps.accounts.middleware.TenantMiddleware",
 ]
 
 REST_FRAMEWORK = {
