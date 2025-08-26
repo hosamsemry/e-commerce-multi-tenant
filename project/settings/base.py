@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "apps.tenancy",
     "apps.accounts",
     "apps.marketplace",
+    "apps.products",
 ]
 
 MIDDLEWARE = [
@@ -35,7 +36,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.tenancy.middleware.TenantMiddleware",
-    "apps.accounts.middleware.TenantMiddleware",
 ]
 
 REST_FRAMEWORK = {
