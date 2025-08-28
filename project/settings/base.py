@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.marketplace",
     "apps.products",
+    "apps.orders",
 ]
 
 MIDDLEWARE = [
@@ -79,3 +80,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DATABASES_ATOMIC_REQUESTS = True
 AUTH_USER_MODEL = "accounts.User"
+
+#Payment
+PAYMOB_API_KEY     = os.getenv("PAYMOB_API_KEY")
+PAYMOB_HMAC_KEY    = os.getenv("PAYMOB_HMAC_KEY")
+PAYMOB_SECRET_KEY  = os.getenv("PAYMOB_SECRET_KEY")
+PAYMOB_PUBLIC_KEY  = os.getenv("PAYMOB_PUBLIC_KEY")
+PAYMOB_MERCHANT_ID = os.getenv("PAYMOB_MERCHANT_ID")
+PAYMOB_INTEGRATION_ID = os.getenv("PAYMOB_INTEGRATION_ID")
+PAYMOB_IFRAME_ID  = os.getenv("PAYMOB_IFRAME_ID")
+PAYMOB_AUTH_URL = "https://accept.paymobsolutions.com/api/auth/tokens"
+PAYMOB_ORDER_URL = "https://accept.paymobsolutions.com/api/ecommerce/orders"
+PAYMOB_PAYMENT_KEY_URL= "https://accept.paymobsolutions.com/api/acceptance/payment_keys"
