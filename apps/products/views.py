@@ -34,8 +34,8 @@ class ProductViewSet(ModelViewSet):
         return [AllowAny()]
 
     def get_queryset(self):
-        print("DEBUG tenant:", self.request.tenant)
-        print("DEBUG user:", self.request.user, self.request.user.role)
+        # print("DEBUG tenant:", self.request.tenant)
+        # print("DEBUG user:", self.request.user, self.request.user.role)
         tenant = self.request.tenant
         user = self.request.user
 
