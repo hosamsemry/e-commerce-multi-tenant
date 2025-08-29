@@ -55,19 +55,6 @@ class CartItemViewSet(viewsets.ModelViewSet):
         return CartItem.objects.filter(cart_id=self.kwargs["cart_pk"], cart__tenant=tenant)
 
 
-class OrderViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
-    def get_queryset(self):
-        tenant = self.request.tenant
-        user = self.request.user
-
-        if user.is_authenticated and user.role == "customer":
-            return Order.objects.filter(customer=user, tenant=tenant).select_related("customer").prefetch_related("items")
-        elif user.is_authenticated and user.role == "seller":
-            return Order.objects.filter(items__product__seller__user=user, tenant=tenant).select_related("customer").prefetch_related("items").distinct()
-        return Order.objects.none()
-
     @action(detail=False, methods=["post"], url_path="checkout")
     def checkout(self, request):
         cart_id = request.data.get("cart_id")
@@ -79,9 +66,15 @@ class OrderViewSet(viewsets.ModelViewSet):
         except Cart.DoesNotExist:
             return Response({"error": "Cart not found"}, status=404)
 
-
         if not cart.items.exists():
             return Response({"error": "Cart is empty"}, status=400)
+
+        for item in cart.items.all():
+            if item.quantity > item.product.inventory:
+                return Response({
+                    "error": f"Insufficient stock for product {item.product.name}. "
+                             f"Available: {item.product.inventory}, requested: {item.quantity}"
+                }, status=400)
 
         with transaction.atomic():
             order = Order.objects.create(
