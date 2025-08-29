@@ -20,8 +20,11 @@ import requests, json
 
 
 class AddressViewSet(viewsets.ModelViewSet):
-    queryset = Address.objects.all()
     serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        tenant = self.request.tenant
+        return Address.objects.filter(tenant=tenant)
 
     def perform_create(self, serializer):
         serializer.save(
@@ -31,8 +34,11 @@ class AddressViewSet(viewsets.ModelViewSet):
 
 
 class CartViewSet(viewsets.ModelViewSet):
-    queryset = Cart.objects.all()
     serializer_class = CartSerializer
+
+    def get_queryset(self):
+        tenant = self.request.tenant
+        return Cart.objects.filter(tenant=tenant)
 
     def perform_create(self, serializer):
         serializer.save(
@@ -42,13 +48,12 @@ class CartViewSet(viewsets.ModelViewSet):
 
 
 class CartItemViewSet(viewsets.ModelViewSet):
-    queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
 
+    def get_queryset(self):
+        tenant = self.request.tenant
+        return CartItem.objects.filter(cart_id=self.kwargs["cart_pk"], cart__tenant=tenant)
 
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all().select_related("customer").prefetch_related("items")
-    serializer_class = OrderSerializer
 
     @action(detail=False, methods=["post"], url_path="checkout")
     def checkout(self, request):
@@ -57,7 +62,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response({"error": "cart_id is required"}, status=400)
 
         try:
-            cart = Cart.objects.get(id=cart_id, tenant=request.tenant)
+            cart = Cart.objects.get(id=cart_id, tenant=request.tenant, customer=request.user)
         except Cart.DoesNotExist:
             return Response({"error": "Cart not found"}, status=404)
 
@@ -65,6 +70,15 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response({"error": "Cart is empty"}, status=400)
 
         with transaction.atomic():
+            for item in cart.items.select_related("product"):
+                product = item.product
+                product.refresh_from_db(lock=True)
+                if item.quantity > product.inventory:
+                    return Response({
+                        "error": f"Insufficient stock for product {product.name}. "
+                                 f"Available: {product.inventory}, requested: {item.quantity}"
+                    }, status=400)
+
             order = Order.objects.create(
                 tenant=request.tenant,
                 customer=request.user,
@@ -72,14 +86,18 @@ class OrderViewSet(viewsets.ModelViewSet):
             )
 
             total = 0
-            for item in cart.items.all():
+            for item in cart.items.select_related("product"):
+                product = item.product
+                product.inventory -= item.quantity
+                product.save()
+
                 OrderItem.objects.create(
                     order=order,
-                    product=item.product,
+                    product=product,
                     quantity=item.quantity,
-                    price=item.product.price,
+                    price=product.price,
                 )
-                total += item.quantity * item.product.price
+                total += item.quantity * product.price
 
             cart.items.all().delete()
 
@@ -112,8 +130,11 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class OrderItemViewSet(viewsets.ModelViewSet):
-    queryset = OrderItem.objects.all().select_related("product", "order")
     serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        tenant = self.request.tenant
+        return OrderItem.objects.filter(order__tenant=tenant).select_related("product", "order")
 
 
 # -------------------------------
