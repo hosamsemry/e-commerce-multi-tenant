@@ -69,14 +69,16 @@ class CartItemViewSet(viewsets.ModelViewSet):
         if not cart.items.exists():
             return Response({"error": "Cart is empty"}, status=400)
 
-        for item in cart.items.all():
-            if item.quantity > item.product.inventory:
-                return Response({
-                    "error": f"Insufficient stock for product {item.product.name}. "
-                             f"Available: {item.product.inventory}, requested: {item.quantity}"
-                }, status=400)
-
         with transaction.atomic():
+            for item in cart.items.select_related("product"):
+                product = item.product
+                product.refresh_from_db(lock=True)
+                if item.quantity > product.inventory:
+                    return Response({
+                        "error": f"Insufficient stock for product {product.name}. "
+                                 f"Available: {product.inventory}, requested: {item.quantity}"
+                    }, status=400)
+
             order = Order.objects.create(
                 tenant=request.tenant,
                 customer=request.user,
@@ -84,14 +86,18 @@ class CartItemViewSet(viewsets.ModelViewSet):
             )
 
             total = 0
-            for item in cart.items.all():
+            for item in cart.items.select_related("product"):
+                product = item.product
+                product.inventory -= item.quantity
+                product.save()
+
                 OrderItem.objects.create(
                     order=order,
-                    product=item.product,
+                    product=product,
                     quantity=item.quantity,
-                    price=item.product.price,
+                    price=product.price,
                 )
-                total += item.quantity * item.product.price
+                total += item.quantity * product.price
 
             cart.items.all().delete()
 
