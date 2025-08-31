@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.conf import settings
 from django.db import transaction
-
+from .tasks import send_order_confirmation
 from .models import Order, OrderItem, Cart, CartItem, Address
 from .serializers import (
     OrderSerializer,
@@ -185,6 +185,10 @@ def paymob_webhook(request):
         order.payment_status = Order.COMPLETE if success else Order.CANCELED
         order.paymob_transaction_id = str(data.get("id"))
         order.save()
+
+        if success:
+            send_order_confirmation.delay(order.id)
+            
         return JsonResponse({"message": "success"}, status=200)
     except Order.DoesNotExist:
         return JsonResponse({"message": "order not found"}, status=404)
