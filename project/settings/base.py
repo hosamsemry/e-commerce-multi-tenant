@@ -92,3 +92,19 @@ PAYMOB_IFRAME_ID  = os.getenv("PAYMOB_IFRAME_ID")
 PAYMOB_AUTH_URL = "https://accept.paymobsolutions.com/api/auth/tokens"
 PAYMOB_ORDER_URL = "https://accept.paymobsolutions.com/api/ecommerce/orders"
 PAYMOB_PAYMENT_KEY_URL= "https://accept.paymobsolutions.com/api/acceptance/payment_keys"
+
+# Celery 
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_BROKER_URL")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+
+#email
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
