@@ -54,18 +54,18 @@ class CartItemViewSet(viewsets.ModelViewSet):
         tenant = self.request.tenant
         return CartItem.objects.filter(cart_id=self.kwargs["cart_pk"], cart__tenant=tenant)
 
-    class OrderViewSet(viewsets.ModelViewSet):
-        serializer_class = OrderSerializer
-        permission_classes = [IsAuthenticated]
-        def get_queryset(self):
-            tenant = self.request.tenant
-            user = self.request.user
+class OrderViewSet(viewsets.ModelViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+    def get_queryset(self):
+        tenant = self.request.tenant
+        user = self.request.user
 
-            if user.is_authenticated and user.role == "customer":
-                return Order.objects.filter(customer=user, tenant=tenant).select_related("customer").prefetch_related("items")
-            elif user.is_authenticated and user.role == "seller":
-                return Order.objects.filter(items__product__seller__user=user, tenant=tenant).select_related("customer").prefetch_related("items").distinct()
-            return Order.objects.none()
+        if user.is_authenticated and user.role == "customer":
+            return Order.objects.filter(customer=user, tenant=tenant).select_related("customer").prefetch_related("items")
+        elif user.is_authenticated and user.role == "seller":
+            return Order.objects.filter(items__product__seller__user=user, tenant=tenant).select_related("customer").prefetch_related("items").distinct()
+        return Order.objects.none()
     
     @action(detail=False, methods=["post"], url_path="checkout")
     def checkout(self, request):
