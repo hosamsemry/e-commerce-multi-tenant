@@ -89,10 +89,8 @@ A robust, production-ready multi-tenant e-commerce platform built with Django an
    ```
 
 3. **Install dependencies:**
-   > **Note:** No requirements.txt was found. Add one with your dependencies, e.g.:
    ```bash
-   pip install django djangorestframework djoser django-environ python-dotenv celery psycopg2-binary drf-spectacular
-   pip install djangorestframework-simplejwt
+   pip install -r requirements.txt
    ```
 
 4. **Set up environment variables:**
