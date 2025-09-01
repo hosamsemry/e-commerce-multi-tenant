@@ -13,6 +13,6 @@ def create_user_profile(sender, instance, created, **kwargs):
         return
 
     if instance.role == "customer":
-        BuyerProfile.objects.create(user=instance)
+        BuyerProfile.objects.create(user=instance, tenant=instance.tenant)
     elif instance.role == "seller":
-        SellerProfile.objects.create(user=instance)
+        SellerProfile.objects.create(user=instance, tenant=instance.tenant)

@@ -8,32 +8,25 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 User = get_user_model()
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    ROLE_CHOICES = (
-        ("customer", "Customer"),
-        ("seller", "Seller"),
-        )
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    password2 = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=ROLE_CHOICES, default="customer")
-    tenant_id = serializers.PrimaryKeyRelatedField(
-        queryset=Tenant.objects.all(), source="tenant", write_only=True
-    )
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "email", "username", "password", "password2", "tenant_id", "role"]
-
-    def validate(self, data):
-        if data["password"] != data["password2"]:
-            raise serializers.ValidationError("Passwords do not match.")
-        if len(data['password']) < 8:
-            raise serializers.ValidationError("Password must be at least 8 characters long.") 
-        return data
+        fields = ["id", "first_name","last_name", "email","password"]
 
     def create(self, validated_data):
-        validated_data.pop("password2")
-        user = User.objects.create_user(**validated_data)
+        request = self.context.get('request')
+        tenant = getattr(request, 'tenant', None) if request else None
+        if not tenant:
+            raise serializers.ValidationError('Tenant could not be determined from request context.')
+        
+        password = validated_data.pop("password")  
+        user = User(**validated_data)
+        user.tenant = tenant
+        user.is_active = False
+        user.set_password(password)
+        user.save()
         return user
 
 
