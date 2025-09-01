@@ -7,6 +7,7 @@ urlpatterns = [
     path('api/', include('apps.tenancy.urls')),
     path("api/accounts/", include("apps.accounts.urls")),
     re_path(r'^auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.jwt')),
     path("api/", include("apps.products.urls")),
     path("api/", include("apps.orders.urls")),
 ]
