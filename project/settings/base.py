@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "rest_framework",
+    "djoser",
     "django.contrib.postgres",
 
     "apps.tenancy",
@@ -108,3 +109,19 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+DJOSER = {
+    "USER_ID_FIELD": "email",
+    "LOGIN_FIELD": "email",
+    'SERIALIZERS': {
+        'user_create': 'apps.accounts.serializers.UserCreateSerializer',
+        "TOKEN_OBTAIN_SERIALIZER": "apps.accounts.serializers.CustomTokenObtainPairSerializer",
+        'current_user': 'apps.accounts.serializers.UserSerializer',
+        'user': 'apps.accounts.serializers.UserSerializer',
+    },
+    'SEND_ACTIVATION_EMAIL': True,
+    'ACTIVATION_URL': 'auth/activate/?uid={uid}&token={token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'auth/reset-password/?uid={uid}&token={token}',
+    'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True
+}
