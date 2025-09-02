@@ -76,6 +76,27 @@ A robust, production-ready multi-tenant e-commerce platform built with Django an
 
 ## Installation & Setup
 
+### Docker Setup
+
+1. **Build and run with Docker Compose:**
+   ```bash
+   docker-compose up --build
+   ```
+   This will start the following services:
+   - **web** (Django app) on [http://localhost:9000](http://localhost:9000)
+   - **db** (Postgres) on port 5432
+   - **redis** on port 6379
+
+2. **Environment Variables:**
+   - Ensure you have a valid `.env` file in the project root (see [Environment Variables](#environment-variables)).
+
+3. **Stopping the services:**
+   ```bash
+   docker-compose down
+   ```
+
+You can still use the manual setup steps below if you prefer not to use Docker.
+
 1. **Clone the repository:**
    ```bash
    git clone <repo-url>
@@ -127,10 +148,24 @@ PAYMOB_HMAC=your-paymob-hmac
 ---
 
 ## Usage
-- Access the API at `http://localhost:8000/api/`
-- Use the Django admin at `http://localhost:8000/admin/`
+- Access the API at `http://localhost:9000/api/` (if using Docker) or `http://localhost:8000/api/` (if running locally)
+- Use the Django admin at `http://localhost:9000/admin/` (Docker) or `http://localhost:8000/admin/` (local)
 - Register/login users via the API (Djoser endpoints)
 - Each request is routed to the correct tenant via `TenantMiddleware` (based on domain or header)
+
+---
+
+## API Documentation
+- Full API endpoint documentation is available in [API_DOCUMENTATION.txt](./API_DOCUMENTATION.txt).
+- Main API root: `/api/`
+- Authentication endpoints: `/auth/` (Djoser JWT)
+- Example endpoints:
+  - `/api/accounts/users/` — List users
+  - `/api/tenants/` — Tenant management
+  - `/api/products/` — Product catalog
+  - `/api/orders/` — Orders and payments
+
+See the documentation file for request/response details, permissions, and all available endpoints.
 
 ---
 
