@@ -1,0 +1,139 @@
+# API Documentation
+
+## Authentication
+
+- `/auth/` — Djoser endpoints for user registration, login, password reset, JWT, etc.
+
+---
+
+## Accounts
+
+### `GET /api/accounts/users/`
+- **Description:** List all users for the current tenant.
+- **View:** `ListUsersView`
+- **Permissions:** Admin user, must belong to the same tenant.
+- **Response:** List of users (`id`, `email`, `role`, `tenant`).
+
+---
+
+## Tenancy
+
+### `GET /api/tenants/`
+### `POST /api/tenants/`
+### `GET /api/tenants/{id}/`
+### `PUT /api/tenants/{id}/`
+### `PATCH /api/tenants/{id}/`
+### `DELETE /api/tenants/{id}/`
+- **Description:** CRUD operations for tenants.
+- **View:** `TenantViewSet`
+- **Permissions:** Admin only.
+- **Fields:** `id`, `name`, `domain_url`, `created_at`, `updated_at`, `is_active`.
+
+---
+
+## Products
+
+### `GET /api/collections/`
+### `POST /api/collections/`
+### `GET /api/collections/{id}/`
+### `PUT /api/collections/{id}/`
+### `PATCH /api/collections/{id}/`
+### `DELETE /api/collections/{id}/`
+- **Description:** CRUD for product collections.
+- **View:** `CollectionViewSet`
+- **Permissions:** Read: Any; Write: Seller only.
+
+### `GET /api/products/`
+### `POST /api/products/`
+### `GET /api/products/{id}/`
+### `PUT /api/products/{id}/`
+### `PATCH /api/products/{id}/`
+### `DELETE /api/products/{id}/`
+- **Description:** CRUD for products.
+- **View:** `ProductViewSet`
+- **Permissions:** Read: Any; Write: Seller only.
+- **Fields:** `id`, `seller`, `title`, `description`, `price`, `inventory`, `last_updated`, `collection`, `images`.
+
+### `GET /api/products/{product_pk}/reviews/`
+### `POST /api/products/{product_pk}/reviews/`
+- **Description:** List and create reviews for a product.
+- **View:** `ReviewViewSet`
+- **Fields:** `id`, `user`, `product`, `description`, `rating`, `created_at`.
+
+### `GET /api/products/{product_pk}/images/`
+### `POST /api/products/{product_pk}/images/`
+- **Description:** List and add images for a product.
+- **View:** `ProductImageViewSet`
+- **Fields:** `id`, `image`.
+
+---
+
+## Orders
+
+### `GET /api/addresses/`
+### `POST /api/addresses/`
+### `GET /api/addresses/{id}/`
+### `PUT /api/addresses/{id}/`
+### `PATCH /api/addresses/{id}/`
+### `DELETE /api/addresses/{id}/`
+- **Description:** CRUD for user addresses.
+- **View:** `AddressViewSet`
+- **Permissions:** Authenticated users.
+
+### `GET /api/carts/`
+### `POST /api/carts/`
+### `GET /api/carts/{id}/`
+### `PUT /api/carts/{id}/`
+### `PATCH /api/carts/{id}/`
+### `DELETE /api/carts/{id}/`
+- **Description:** CRUD for shopping carts.
+- **View:** `CartViewSet`
+- **Permissions:** Authenticated users.
+
+### `GET /api/carts/{cart_pk}/items/`
+### `POST /api/carts/{cart_pk}/items/`
+### `GET /api/carts/{cart_pk}/items/{id}/`
+### `PUT /api/carts/{cart_pk}/items/{id}/`
+### `PATCH /api/carts/{cart_pk}/items/{id}/`
+### `DELETE /api/carts/{cart_pk}/items/{id}/`
+- **Description:** CRUD for items in a cart.
+- **View:** `CartItemViewSet`
+
+### `GET /api/orders/`
+### `POST /api/orders/`
+### `GET /api/orders/{id}/`
+### `PUT /api/orders/{id}/`
+### `PATCH /api/orders/{id}/`
+### `DELETE /api/orders/{id}/`
+- **Description:** CRUD for orders.
+- **View:** `OrderViewSet`
+- **Permissions:** Authenticated users (role-based filtering: customer sees their orders, seller sees their sales).
+
+### `POST /api/orders/checkout/`
+- **Description:** Checkout endpoint to create an order from a cart and initiate payment.
+- **View:** `OrderViewSet.checkout`
+- **Body:** `{ "cart_id": "<cart_uuid>" }`
+- **Response:** Order and payment info, including Paymob iframe URL.
+
+### `GET|POST /api/paymob-webhook/`
+- **Description:** Paymob webhook endpoint for payment status updates.
+- **View:** `paymob_webhook`
+- **Notes:** Handles both GET and POST with flexible payload parsing and HMAC verification.
+
+### `GET /api/orders/{order_pk}/items/`
+### `POST /api/orders/{order_pk}/items/`
+### `GET /api/orders/{order_pk}/items/{id}/`
+### `PUT /api/orders/{order_pk}/items/{id}/`
+### `PATCH /api/orders/{order_pk}/items/{id}/`
+### `DELETE /api/orders/{order_pk}/items/{id}/`
+- **Description:** CRUD for items in an order.
+- **View:** `OrderItemViewSet`
+
+---
+
+## Notes
+
+- All endpoints are tenant-aware; requests are filtered by the current tenant.
+- Most endpoints require authentication; some require specific roles (admin, seller).
+- JWT authentication via Djoser is supported.
+- All data is returned in JSON.
