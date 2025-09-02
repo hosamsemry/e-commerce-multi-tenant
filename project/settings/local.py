@@ -10,7 +10,7 @@ DATABASES = {
         "NAME": "ecommerce",
         "USER": os.getenv('POSTGRES_USER', 'postgres'),
         "PASSWORD": os.getenv('POSTGRES_PASSWORD'),
-        "HOST": "localhost",
+        "HOST": os.getenv('POSTGRES_HOST'),
         "PORT": "5432",
     }
 }
