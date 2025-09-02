@@ -18,6 +18,7 @@ djangorestframework_simplejwt==5.5.1
 djoser==2.3.3
 dotenv==0.9.9
 drf-nested-routers==0.94.2
+gunicorn==23.0.0
 idna==3.10
 iniconfig==2.1.0
 kombu==5.5.4
