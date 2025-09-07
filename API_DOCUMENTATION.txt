@@ -2,7 +2,79 @@
 
 ## Authentication
 
-- `/auth/` — Djoser endpoints for user registration, login, password reset, JWT, etc.
+- Djoser endpoints for user registration, login, password reset, JWT, etc.
+### `POST /auth/users/`
+- **Description:** Create a new user.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Any.
+- **Fields:**  `first name`, `last name`, `email`, `password`.
+
+### `POST /auth/users/activation/`
+- **Description:** Activate a user.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Any.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/me/`
+- **Description:** Get current user.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/reset_password/`
+- **Description:** Reset password.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/reset_password_confirm/`
+- **Description:** Reset password.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/set_password/`
+- **Description:** Set password.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/reset_email/`
+- **Description:** Reset email.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/reset_email_confirm/`
+- **Description:** Reset email.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/users/set_email/`
+- **Description:** Set email.
+- **View:** `UserCreateSerializer`
+- **Permissions:** Authenticated user.
+- **Fields:**  `email`, `password`.
+
+
+### `POST /auth/jwt/create/`
+- **Description:** Create a JWT token.
+- **View:** `TokenObtainPairSerializer`
+- **Permissions:** Any.
+- **Fields:**  `email`, `password`.
+
+### `POST /auth/jwt/refresh/`
+- **Description:** Refresh a JWT token.
+- **View:** `TokenObtainPairSerializer`
+- **Permissions:** Authenticated user
+- **Fields:**  `refresh`.
+
+### `POST /auth/jwt/verify/`
+- **Description:** Verify a JWT token.
+- **View:** `TokenObtainPairSerializer`
+- **Permissions:** Authenticated user
+- **Fields:**  `token`.
 
 ---
 
